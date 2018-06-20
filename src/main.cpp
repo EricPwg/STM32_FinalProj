@@ -205,6 +205,7 @@ int Dot_array::init(GPIO_TypeDef* gpio, int DIN, int CS, int CLK){
 	//Close display test
 	send_7seg16(gpio, DIN, CS, CLK, SEG_ADDRESS_DISPLAY_TEST, 0x00);
 	send_7seg16(gpio, DIN, CS, CLK, SEG_ADDRESS_SCAN_LIMIT, 0x07);
+	send_7seg16(gpio, DIN, CS, CLK, SEG_ADDRESS_DECODE_MODE, 0x00);
 	send_7seg16(gpio, DIN, CS, CLK, SEG_ADDRESS_SHUTDOWN, 0x01);
 	send_7seg16(gpio, DIN, CS, CLK, SEG_ADDRESS_ITENSITY, 0x05);
 	return 0;
@@ -257,8 +258,24 @@ int main(){
 		//A.send_7seg16(SEGgpio, SEGdin, SEGcs, SEGclk, 5, t);
 		delay_without_interrupt(500);
 		A.send_7seg(SEGgpio, SEGdin, SEGcs, SEGclk, show_data);
-		delay_without_interrupt(500);
-		t++;
+		for (int i=0;i<5;i++){
+			for (int j=0;j<32;j++){
+					show_data[j] <<= 1;
+
+				}
+			delay_without_interrupt(10);
+			A.send_7seg(SEGgpio, SEGdin, SEGcs, SEGclk, show_data);
+			for (int j=0;j<32;j++){
+				show_data[j] >>= 1;
+
+			}
+			delay_without_interrupt(10);
+			A.send_7seg(SEGgpio, SEGdin, SEGcs, SEGclk, show_data);
+		}
+
+
+
+
 	}
 
 
