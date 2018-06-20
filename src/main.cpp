@@ -80,14 +80,52 @@ class Dot_array{
 };
 
 void Dot_array::send_7seg(GPIO_TypeDef* gpio, int DIN, int CS, int CLK, int *all_data){
-	int data = 5;
-	for (int a = 1;a<4;a++){
-		int addr = a;
+	//int data = 5;
+	int data_arr[16];
 
+	for (int addr = 1; addr < 9 ;addr++){
+
+		data_arr[12] = all_data[addr-1]&0xFF;
+		data_arr[13] = (all_data[addr-1] >> 8)&0xFF;
+		data_arr[14] = (all_data[addr-1] >> 16)&0xFF;
+		data_arr[15] = (all_data[addr-1] >> 24)&0xFF;
+
+		data_arr[8] = all_data[addr+7]&0xFF;
+		data_arr[9] = (all_data[addr+7] >> 8)&0xFF;
+		data_arr[10] = (all_data[addr+7] >> 16)&0xFF;
+		data_arr[11] = (all_data[addr+7] >> 24)&0xFF;
+
+		data_arr[4] = all_data[addr+15]&0xFF;
+		data_arr[5] = (all_data[addr+15] >> 8)&0xFF;
+		data_arr[6] = (all_data[addr+15] >> 16)&0xFF;
+		data_arr[7] = (all_data[addr+15] >> 24)&0xFF;
+
+		data_arr[0] = all_data[addr+23]&0xFF;
+		data_arr[1] = (all_data[addr+23] >> 8)&0xFF;
+		data_arr[2] = (all_data[addr+23] >> 16)&0xFF;
+		data_arr[3] = (all_data[addr+23] >> 24)&0xFF;
+		/*
+		data_arr[0] = all_data[addr-1] & 0xFF;
+		data_arr[1] = 2;
+		data_arr[2] = 3;
+		data_arr[3] = 4;
+		data_arr[4] = 5;
+		data_arr[5] = 6;
+		data_arr[6] = 7;
+		data_arr[7] = 8;
+		data_arr[8] = 9;
+		data_arr[9] = 10;
+		data_arr[10] = 11;
+		data_arr[11] = 12;
+		data_arr[12] = 13;
+		data_arr[13] = 14;
+		data_arr[14] = 15;
+		data_arr[15] = 16;
+		*/
 		set_gpio(gpio, CLK);
 		reset_gpio(gpio, CS);
-
-		for (int _tt;_tt<16;_tt++){
+		for (int _tt = 0;_tt<16;_tt++){
+			int data = data_arr[_tt];
 			for (int i=0;i<4;i++) send_7seg_onebit(gpio, DIN, CLK, 0);
 			for (int i=0;i<4;i++){
 				int t = (addr >> (3-i))&0x1;
@@ -95,7 +133,7 @@ void Dot_array::send_7seg(GPIO_TypeDef* gpio, int DIN, int CS, int CLK, int *all
 				else send_7seg_onebit(gpio, DIN, CLK, 0);
 			}
 			for (int i=0;i<8;i++){
-				int t = (data >> (7-i))&0x1;
+				int t = (data >> (i))&0x1;
 				if (t == 1) send_7seg_onebit(gpio, DIN, CLK, 1);
 				else send_7seg_onebit(gpio, DIN, CLK, 0);
 			}
@@ -105,7 +143,7 @@ void Dot_array::send_7seg(GPIO_TypeDef* gpio, int DIN, int CS, int CLK, int *all
 		reset_gpio(gpio, CLK);
 		set_gpio(gpio, CS);
 		set_gpio(gpio, CLK);
-		//delay_without_interrupt(1);
+		delay_without_interrupt(10);
 	}
 
 }
@@ -117,7 +155,6 @@ void Dot_array::send_7seg16(GPIO_TypeDef* gpio, int DIN, int CS, int CLK, int ad
 
 	for (int _t = 0;_t<16;_t++){
 		for (int i=0;i<4;i++) send_7seg_onebit(gpio, DIN, CLK, 0);
-
 		for (int i=0;i<4;i++){
 			int t = (addr >> (3-i))&0x1;
 			if (t == 1) send_7seg_onebit(gpio, DIN, CLK, 1);
@@ -182,29 +219,42 @@ int main(){
 	}
 	//return 0;
 	delay_without_interrupt(100);
-	int show_data[16];
-	show_data[0]  = 0b00000000000000000000000000000000;
-	show_data[1]  = 0b00000000000000000000000000000000;
-	show_data[2]  = 0b00000000000000000000000000000000;
-	show_data[3]  = 0b11111111111111111111111111111111;
-
-	show_data[4]  = 0b00000000000000000000000000000000;
-	show_data[5]  = 0b00000000000000000000000000000000;
+	int show_data[32];
+	show_data[7]  = 0b00000000000000000000000000001111;
 	show_data[6]  = 0b00000000000000000000000000000000;
-	show_data[7]  = 0b11111111111111111111111111111111;
-
-	show_data[8]  = 0b00000000000000000000000000000000;
-	show_data[9]  = 0b00000000000000000000000000000000;
-	show_data[10] = 0b00000000000000000000000000000000;
-	show_data[11] = 0b00000000000000000000000000000000;
-
-	show_data[12] = 0b00000000000000000000000000000000;
-	show_data[13] = 0b00000000000000000000000000000000;
-	show_data[14] = 0b00000000000000000000000000000000;
+	show_data[5]  = 0b00000000000000000000000000000000;
+	show_data[4]  = 0b11111111111111111111111111111111;
+	show_data[3]  = 0b00000000000000000000000000000000;
+	show_data[2]  = 0b00000000000000000000000000000000;
+	show_data[1]  = 0b00000000000000000000000000000000;
+	show_data[0]  = 0b11111111111111111111111111111111;
 	show_data[15] = 0b00000000000000000000000000000000;
+	show_data[14] = 0b00000000000000000000000000000000;
+	show_data[13] = 0b00000000000000000000000000000000;
+	show_data[12] = 0b00011111111111111111111111111111;
+	show_data[11] = 0b00000000000000000000000000000000;
+	show_data[10] = 0b00000000000000000000000000000000;
+	show_data[9]  = 0b00000000000000000000000000000000;
+	show_data[8]  = 0b00000000000000000000000000000000;
+	show_data[23] = 0b00000000000000000000000000000000;
+	show_data[22] = 0b00000000000000000000000000000000;
+	show_data[21] = 0b00000000000000000000000000000000;
+	show_data[20] = 0b00011111111111111111111111111111;
+	show_data[19] = 0b00000000000000000000000000000000;
+	show_data[18] = 0b00000000000000000000000000000000;
+	show_data[17] = 0b00000000000000000000000000000000;
+	show_data[16] = 0b00000000000000000000000000000000;
+	show_data[31] = 0b00000000000000000000000000000000;
+	show_data[30] = 0b00000000000000000000000000000000;
+	show_data[29] = 0b00000000000000000000000000000000;
+	show_data[28] = 0b00011111111111111111111111111111;
+	show_data[27] = 0b00000000000000000000000000000000;
+	show_data[26] = 0b00000000000000000000000000000000;
+	show_data[25] = 0b00000000000000000000000000000000;
+	show_data[24] = 0b00000000000000000000000000000000;
 	int t = 0;
 	while(1){
-		A.send_7seg16(SEGgpio, SEGdin, SEGcs, SEGclk, 5, t);
+		//A.send_7seg16(SEGgpio, SEGdin, SEGcs, SEGclk, 5, t);
 		delay_without_interrupt(500);
 		A.send_7seg(SEGgpio, SEGdin, SEGcs, SEGclk, show_data);
 		delay_without_interrupt(500);
